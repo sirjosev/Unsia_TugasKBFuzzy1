@@ -90,36 +90,48 @@ class FuzzySystem:
         
         # Plot Caps Ratio
         fig1, ax1 = plt.subplots()
+        self.caps_ratio.view(ax=ax1) # Always draw static shapes first
         if show_result:
-            self.caps_ratio.view(sim=self.hoax_sim, ax=ax1)
+            # Draw user input line
+            ax1.axvline(x=self.input_caps, color='r', linestyle='--', linewidth=3, label='Input')
+            ax1.legend()
             ax1.set_title(f"Input: Caps-lock Ratio ({self.input_caps:.1f}%)")
         else:
-            self.caps_ratio.view(ax=ax1)
             ax1.set_title("Membership: Caps-lock Ratio")
         figs.append(fig1)
         
         # Plot Provocative Score
         fig2, ax2 = plt.subplots()
+        self.provocative_score.view(ax=ax2)
         if show_result:
-            self.provocative_score.view(sim=self.hoax_sim, ax=ax2)
+            ax2.axvline(x=self.input_prov, color='r', linestyle='--', linewidth=3, label='Input')
+            ax2.legend()
             ax2.set_title(f"Input: Provocative Score ({self.input_prov:.1f})")
         else:
-            self.provocative_score.view(ax=ax2)
             ax2.set_title("Membership: Provocative Score")
         figs.append(fig2)
 
         # Plot Output High
         fig3, ax3 = plt.subplots()
-        if show_result:
-            try:
-                self.hoax_likelihood.view(sim=self.hoax_sim, ax=ax3)
+        
+        # Attempt to draw full simulation result (shaded), fallback to static + line
+        try:
+            if show_result:
+                # First try the built-in view with simulation
+                # If this was returning blank before, we skip it or try to combine
+                # We will just stick to static + line for reliability as requested by user feedback
+                self.hoax_likelihood.view(ax=ax3) 
                 output_val = self.hoax_sim.output['hoax_likelihood']
+                ax3.axvline(x=output_val, color='b', linestyle='--', linewidth=3, label='Result')
+                ax3.legend()
                 ax3.set_title(f"Result: Hoax Likelihood ({output_val:.1f}%)")
-            except:
+            else:
                 self.hoax_likelihood.view(ax=ax3)
-        else:
+                ax3.set_title("Membership: Hoax Likelihood")
+        except:
+            # Fallback if anything goes wrong with output plotting
             self.hoax_likelihood.view(ax=ax3)
-            ax3.set_title("Membership: Hoax Likelihood")
+            
         figs.append(fig3)
         
         return figs
