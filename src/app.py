@@ -74,11 +74,14 @@ with st.sidebar:
     st.markdown("---")
     
     st.warning("🔑 API Keys Required for Agent")
-    openai_key = st.text_input("OpenAI API Key", type="password", help="Required for reasoning.")
+    openrouter_key = st.text_input("OpenRouter API Key (DeepSeek)", type="password", help="Required for reasoning. (Auto-filled from .env if available)")
     tavily_key = st.text_input("Tavily API Key", type="password", help="Required for internet search. (Optional, falls back to DDG but less effective)")
     
-    if openai_key:
-        os.environ["OPENAI_API_KEY"] = openai_key
+    if openrouter_key:
+        os.environ["OPENROUTER_API_KEY"] = openrouter_key
+    elif os.environ.get("OPENROUTER_API_KEY"):
+        st.success("✅ DeepSeek API Key Detected")
+        
     if tavily_key:
         os.environ["TAVILY_API_KEY"] = tavily_key
         
@@ -98,8 +101,8 @@ with col1:
     input_text = st.text_area("Masukkan Judul Berita:", height=100, placeholder="Contoh: MENGEJUTKAN!! Babi Ngepet Ditemukan di Depok...")
 
     if st.button("🔍 JALANKAN AGEN"):
-        if not os.environ.get("OPENAI_API_KEY"):
-            st.error("⚠️ OpenAI API Key is missing. Please enter it in the sidebar.")
+        if not os.environ.get("OPENROUTER_API_KEY"):
+            st.error("⚠️ OpenRouter API Key is missing. Please enter it in the sidebar.")
         elif input_text:
             with st.status('🤖 Agent sedang bekerja...', expanded=True) as status:
                 st.write("1️⃣  **Verifier**: Searching Internet for facts...")

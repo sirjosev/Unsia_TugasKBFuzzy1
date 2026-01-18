@@ -14,8 +14,13 @@ class AgentState(TypedDict):
     final_verdict: str
 
 # Initialize LLM
-# Note: This requires OPENAI_API_KEY to be set in .env
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+# Note: This requires OPENROUTER_API_KEY to be set in .env
+llm = ChatOpenAI(
+    model="deepseek/deepseek-r1:free",
+    api_key=os.environ.get("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1",
+    temperature=0
+)
 
 # --- Nodes ---
 
