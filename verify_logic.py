@@ -32,6 +32,14 @@ def test_system():
         # 2. Fuzzy
         score, label = fuzzy.calculate(analysis['caps_ratio'], analysis['provocative_score'])
         print(f"  Fuzzy Result: {score:.1f}% -> {label}")
+        
+        # 3. Test Plotting (Logic check only)
+        try:
+            figs = fuzzy.get_plots(show_result=True)
+            print(f"  Plots generated successfully: {len(figs)} figures.")
+            plt.close('all')
+        except Exception as e:
+            print(f"  [ERROR] Plotting failed: {e}")
 
     print("\n[SUCCESS] Logic verification complete.")
 

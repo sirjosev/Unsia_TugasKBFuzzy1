@@ -76,6 +76,8 @@ with st.sidebar:
 # Main Content
 col1, col2 = st.columns([2, 1])
 
+show_fuzzy_result = False
+
 with col1:
     st.title("Deteksi Kebenaran Berita")
     st.markdown("##### *Uncertainty Reasoning System*")
@@ -90,6 +92,7 @@ with col1:
                 
                 # 2. Fuzzy Inference
                 score, label = fuzzy.calculate(nlp_result['caps_ratio'], nlp_result['provocative_score'])
+                show_fuzzy_result = True
                 
                 time.sleep(0.8) # Simulate processing for UX
                 
@@ -125,10 +128,13 @@ with col1:
 
 with col2:
     st.header("📊 Visualisasi Fuzzy")
-    st.info("Grafik Fungsi Keanggotaan")
+    if show_fuzzy_result:
+        st.success("Grafik Menampilkan Posisi Input")
+    else:
+        st.info("Grafik Fungsi Keanggotaan (Statis)")
     
     # Show plots
-    figs = fuzzy.get_plots()
+    figs = fuzzy.get_plots(show_result=show_fuzzy_result)
     for fig in figs:
         st.pyplot(fig)
         

@@ -78,26 +78,45 @@ class FuzzySystem:
             
         return result_score, label
 
-    def get_plots(self):
-        """Returns matplotlib figures of the membership functions for visualization."""
+    def get_plots(self, show_result=False):
+        """
+        Returns matplotlib figures.
+        If show_result=True, it plots the specific input/output on the graphs.
+        """
         figs = []
         
         # Plot Caps Ratio
         fig1, ax1 = plt.subplots()
-        self.caps_ratio.view(ax=ax1)
-        ax1.set_title("Membership: Caps-lock Ratio")
+        if show_result:
+            self.caps_ratio.view(sim=self.hoax_sim, ax=ax1)
+            ax1.set_title(f"Input: Caps-lock Ratio ({self.hoax_sim.input['caps_ratio']}%)")
+        else:
+            self.caps_ratio.view(ax=ax1)
+            ax1.set_title("Membership: Caps-lock Ratio")
         figs.append(fig1)
         
         # Plot Provocative Score
         fig2, ax2 = plt.subplots()
-        self.provocative_score.view(ax=ax2)
-        ax2.set_title("Membership: Provocative Score")
+        if show_result:
+            self.provocative_score.view(sim=self.hoax_sim, ax=ax2)
+            ax2.set_title(f"Input: Provocative Score ({self.hoax_sim.input['provocative_score']})")
+        else:
+            self.provocative_score.view(ax=ax2)
+            ax2.set_title("Membership: Provocative Score")
         figs.append(fig2)
 
         # Plot Output High
         fig3, ax3 = plt.subplots()
-        self.hoax_likelihood.view(ax=ax3)
-        ax3.set_title("Membership: Hoax Likelihood")
+        if show_result:
+            try:
+                self.hoax_likelihood.view(sim=self.hoax_sim, ax=ax3)
+                output_val = self.hoax_sim.output['hoax_likelihood']
+                ax3.set_title(f"Result: Hoax Likelihood ({output_val:.1f}%)")
+            except:
+                self.hoax_likelihood.view(ax=ax3)
+        else:
+            self.hoax_likelihood.view(ax=ax3)
+            ax3.set_title("Membership: Hoax Likelihood")
         figs.append(fig3)
         
         return figs
