@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
 import time
-from nlp_engine import NLPEngine
-from fuzzy_logic import FuzzySystem
+import os
+from src.agent import graph
+from src.fuzzy_logic import FuzzySystem
 
 # Page Configuration for Premium Feel
 st.set_page_config(
-    page_title="TruthLens - AI Hoax Detector",
+    page_title="TruthLens - AI Agent Hoax Detector",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -44,33 +45,45 @@ st.markdown("""
         color: #fff;
     }
     .metric-card {
-        background-color: #1f2937;
+        background-color: #1f2937; # Dark card bg
         padding: 20px;
         border-radius: 10px;
         border-left: 5px solid #ff4b4b;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    .agent-step {
+        border-left: 2px solid #00c0f0;
+        padding-left: 10px;
+        margin-bottom: 10px;
+        color: #a0a0a0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Initialize Engines
+# Initialize Fuzzy System for Plotting (Local Instance)
 @st.cache_resource
-def load_engines():
-    return NLPEngine(), FuzzySystem()
+def load_fuzzy():
+    return FuzzySystem()
 
-nlp, fuzzy = load_engines()
+fuzzy_viz = load_fuzzy()
 
 # Sidebar
 with st.sidebar:
-    st.title("🛡️ TruthLens v1.0")
+    st.title("🛡️ TruthLens Agent")
+    st.caption("v2.0 - LangGraph Enhanced")
     st.markdown("---")
-    st.info("**Sistem Cerdas Deteksi Hoax**\nMenggunakan *Fuzzy Logic* untuk meniru penalaran manusia dalam menilai berita.")
     
-    st.markdown("### ⚙️ Parameter Fuzzy")
-    st.markdown("- **Capslock Ratio**: Seberapa banyak huruf besar?")
-    st.markdown("- **Provocative Score**: Kata-kata bombastis & tanda baca.")
+    st.warning("🔑 API Keys Required for Agent")
+    openai_key = st.text_input("OpenAI API Key", type="password", help="Required for reasoning.")
+    tavily_key = st.text_input("Tavily API Key", type="password", help="Required for internet search. (Optional, falls back to DDG but less effective)")
     
+    if openai_key:
+        os.environ["OPENAI_API_KEY"] = openai_key
+    if tavily_key:
+        os.environ["TAVILY_API_KEY"] = tavily_key
+        
     st.markdown("---")
+    st.info("**Mode Agen Cerdas**\nMengkombinasikan *Fuzzy Logic* dengan *Pencarian Internet* untuk verifikasi fakta mendalam.")
     st.caption("© 2026 Tugas KB IF504")
 
 # Main Content
@@ -80,48 +93,56 @@ show_fuzzy_result = False
 
 with col1:
     st.title("Deteksi Kebenaran Berita")
-    st.markdown("##### *Uncertainty Reasoning System*")
+    st.markdown("##### *Agentic Verification System*")
     
     input_text = st.text_area("Masukkan Judul Berita:", height=100, placeholder="Contoh: MENGEJUTKAN!! Babi Ngepet Ditemukan di Depok...")
 
-    if st.button("🔍 ANALISIS SEKARANG"):
-        if input_text:
-            with st.spinner('Memproses Linguistik & Kalkulasi Fuzzy...'):
-                # 1. NLP Analysis
-                nlp_result = nlp.analyze(input_text)
-                
-                # 2. Fuzzy Inference
-                score, label = fuzzy.calculate(nlp_result['caps_ratio'], nlp_result['provocative_score'])
-                show_fuzzy_result = True
-                
-                time.sleep(0.8) # Simulate processing for UX
-                
-                # Display Result
-                st.markdown("### Hasil Analisis")
-                
-                # Result Banner
-                if score > 60:
-                    st.error(f"⚠️ {label}")
-                elif score > 40:
-                    st.warning(f"🤔 {label}")
-                else:
-                    st.success(f"✅ {label}")
-                
-                # Detailed Metrics
-                st.markdown("#### Faktor Penentu (Crisp Inputs)")
-                m1, m2, m3 = st.columns(3)
-                
-                with m1:
-                    st.metric("Capslock Ratio", f"{nlp_result['caps_ratio']:.1f}%")
-                with m2:
-                    st.metric("Provocative Score", f"{nlp_result['provocative_score']:.1f}")
-                with m3:
-                    st.metric("Hoax Probability", f"{score:.1f}%")
+    if st.button("🔍 JALANKAN AGEN"):
+        if not os.environ.get("OPENAI_API_KEY"):
+            st.error("⚠️ OpenAI API Key is missing. Please enter it in the sidebar.")
+        elif input_text:
+            with st.status('🤖 Agent sedang bekerja...', expanded=True) as status:
+                st.write("1️⃣  **Verifier**: Searching Internet for facts...")
+                # Run the graph
+                try:
+                    inputs = {"news_text": input_text}
+                    result = graph.invoke(inputs)
+                    
+                    st.write("2️⃣  **Analyst**: Calculating Fuzzy Logic Score...")
+                    # Extract fuzzy data from agent result
+                    fuzzy_data = result.get('fuzzy_assessment', {})
+                    caps_val = fuzzy_data.get('caps_ratio_percent', 0)
+                    prov_val = fuzzy_data.get('provocative_score_raw', 0)
+                    
+                    # Update local fuzzy instance for visualization
+                    score, label = fuzzy_viz.calculate(caps_val, prov_val)
+                    show_fuzzy_result = True
+                    
+                    st.write("3️⃣  **Finalizer**: Synthesizing Verdict...")
+                    status.update(label="✅ Analysis Complete!", state="complete", expanded=False)
+                    
+                    # --- RESULTS DISPLAY ---
+                    st.markdown("### Kesimpulan Agen")
+                    st.write(result.get('final_verdict'))
+                    
+                    st.markdown("---")
+                    
+                    # Detailed Metrics
+                    st.markdown("#### Faktor Penentu (Analisis Internal)")
+                    m1, m2, m3 = st.columns(3)
+                    with m1:
+                        st.metric("Capslock Ratio", f"{caps_val:.1f}%")
+                    with m2:
+                        st.metric("Provocative Score", f"{prov_val:.1f}")
+                    with m3:
+                        st.metric("Hoax Probability", f"{score:.1f}%")
 
-                # Explanation
-                st.markdown("---")
-                st.markdown("#### 🧠 Logika Keputusan")
-                st.write(f"Sistem mendeteksi **{nlp_result['caps_ratio']:.1f}%** huruf kapital dan skor provokasi **{nlp_result['provocative_score']}**. Berdasarkan aturan fuzzy, jika kedua nilai ini tinggi, kemungkinan hoax meningkat.")
+                    # Search Evidence
+                    with st.expander("🌐 Lihat Hasil Pencarian Internet"):
+                        st.code(result.get('search_results', 'No results'), language="text")
+
+                except Exception as e:
+                     st.error(f"Agent Error: {str(e)}")
 
         else:
             st.error("Mohon masukkan teks berita terlebih dahulu.")
@@ -134,16 +155,7 @@ with col2:
         st.info("Grafik Fungsi Keanggotaan (Statis)")
     
     # Show plots
-    figs = fuzzy.get_plots(show_result=show_fuzzy_result)
+    figs = fuzzy_viz.get_plots(show_result=show_fuzzy_result)
     for fig in figs:
         st.pyplot(fig)
-        
-    st.markdown("---")
-    st.markdown("#### 📂 Dataset Kalibrasi")
-    try:
-        df = pd.read_csv("data/news_samples.csv")
-        st.dataframe(df.head(5), hide_index=True)
-        st.caption(f"Total Database: {len(df)} entri")
-    except:
-        st.error("Dataset not found.")
 

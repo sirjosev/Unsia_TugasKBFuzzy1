@@ -10,4 +10,6 @@ services:
       - .:/app
     environment:
       - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
     restart: unless-stopped
