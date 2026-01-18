@@ -58,8 +58,11 @@ class FuzzySystem:
            - result_score: float (0-100)
            - label: str (Safe/Suspicious/Hoax)
         """
-        self.hoax_sim.input['caps_ratio'] = min(caps_val, 100)
-        self.hoax_sim.input['provocative_score'] = min(prov_val, 100)
+        self.input_caps = min(caps_val, 100)
+        self.input_prov = min(prov_val, 100)
+        
+        self.hoax_sim.input['caps_ratio'] = self.input_caps
+        self.hoax_sim.input['provocative_score'] = self.input_prov
         
         try:
             self.hoax_sim.compute()
@@ -89,7 +92,7 @@ class FuzzySystem:
         fig1, ax1 = plt.subplots()
         if show_result:
             self.caps_ratio.view(sim=self.hoax_sim, ax=ax1)
-            ax1.set_title(f"Input: Caps-lock Ratio ({self.hoax_sim.input['caps_ratio']}%)")
+            ax1.set_title(f"Input: Caps-lock Ratio ({self.input_caps:.1f}%)")
         else:
             self.caps_ratio.view(ax=ax1)
             ax1.set_title("Membership: Caps-lock Ratio")
@@ -99,7 +102,7 @@ class FuzzySystem:
         fig2, ax2 = plt.subplots()
         if show_result:
             self.provocative_score.view(sim=self.hoax_sim, ax=ax2)
-            ax2.set_title(f"Input: Provocative Score ({self.hoax_sim.input['provocative_score']})")
+            ax2.set_title(f"Input: Provocative Score ({self.input_prov:.1f})")
         else:
             self.provocative_score.view(ax=ax2)
             ax2.set_title("Membership: Provocative Score")
