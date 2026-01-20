@@ -5,7 +5,7 @@ services:
     build: .
     container_name: fuzzy_hoax_detector
     ports:
-      - "8501:8501"
+      - "8501:7860"
     volumes:
       - .:/app
     environment:

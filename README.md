@@ -96,6 +96,29 @@ TugasKBSistemFuzzy/
 | "VIRAL!! AZAB ANAK DURHAKA BERUBAH JADI BATU??" | **HOAX (Berita Palsu)** | Capslock tinggi, ada kata "Viral", "Azab", tanda tanya ganda. |
 | "Awas, Jangan Makan Ini Malam Hari" | **SUSPICIOUS (Perlu Verifikasi)** | Capslock normal, tapi ada kata "Awas" (Clickbait). |
 
+
+---
+
+## 🌐 Deployment to Hugging Face Spaces (Docker)
+
+Project ini siap untuk di-deploy ke **Hugging Face Spaces** menggunakan Docker SDK.
+
+1.  **Buat Space Baru**:
+    *   Login ke Hugging Face.
+    *   Klik **New Space**.
+    *   Pilih **Space Name** (bebas).
+    *   Pilih **License** (misal: MIT).
+    *   Pilih **Sdk**: **Docker** (PENTING! Jangan pilih Streamlit, pilih Docker karena kita menggunakan konfigurasi kustom).
+    *   Pilih Visibility: **Public**.
+
+2.  **Upload File**:
+    *   Anda bisa menggunakan git atau upload manual via browser.
+    *   Pastikan semua file (`src/`, `data/`, `Dockerfile`, `requirements.txt`) ter-upload.
+
+3.  **Tunggu Build**:
+    *   Hugging Face akan otomatis mendeteksi `Dockerfile` dan membangun image.
+    *   Setelah status "Running", aplikasi siap digunakan di tab "App".
+
 ---
 
 **Dibuat oleh Kelompok KB - IF504**
