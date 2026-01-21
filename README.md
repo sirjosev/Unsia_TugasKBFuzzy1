@@ -1,3 +1,12 @@
+---
+title: HoaxDetector V0.1 UnsiaWorks
+emoji: 👁
+colorFrom: red
+colorTo: green
+sdk: docker
+pinned: false
+---
+
 # 🛡️ TruthLens: AI Hoax Detector
 ### Tugas Besar Kecerdasan Buatan (IF504/IF505)
 **Topik: Uncertainty Reasoning dengan Sistem Fuzzy & NLP**
@@ -124,13 +133,6 @@ Project ini siap untuk di-deploy ke **Hugging Face Spaces** menggunakan Docker S
 **Dibuat oleh Kelompok KB - IF504**
 *Semester Ganjil 2025/2026*
 
----
-title: HoaxDetector V0.1 UnsiaWorks
-emoji: 👁
-colorFrom: red
-colorTo: green
-sdk: docker
-pinned: false
----
+
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
